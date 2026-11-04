@@ -1,0 +1,55 @@
+[
+  {
+    "id": "acpc",
+    "org": "ACPC Damietta University",
+    "short": "ACPC DU",
+    "roles": [
+      {
+        "title": "Mentor",
+        "start": "2024-09",
+        "end": "2025-10",
+        "text": "Mentored students through the Data Structures and Algorithms track."
+      },
+      {
+        "title": "Instructor",
+        "start": "2024-09",
+        "end": "2025-10",
+        "text": "Taught Data Structures and Algorithms sessions in the ACPC curriculum."
+      },
+      {
+        "title": "Problem Setter",
+        "start": "2024-09",
+        "end": "2026-08",
+        "text": "Wrote problems for ACPC Damietta training and contests."
+      },
+      {
+        "title": "Technical Team Head",
+        "start": "2024-11",
+        "end": "2026-10",
+        "featured": true,
+        "text": "Architected the Data Structures and Algorithms curriculum for 500+ students and led a team of 40 mentors and problem setters."
+      },
+      {
+        "title": "Community Leader",
+        "start": "2026-03",
+        "end": null,
+        "featured": true,
+        "text": "Leads a cross-functional organization of 4 committees to grow the university's largest technical community."
+      }
+    ]
+  },
+  {
+    "id": "ieee",
+    "org": "IEEE Damietta Branch",
+    "short": "IEEE DU",
+    "roles": [
+      {
+        "title": "Competitive Programming Committee Head",
+        "start": "2025-03",
+        "end": "2026-09",
+        "featured": true,
+        "text": "Ran intensive workshops on competitive programming and advanced problem-solving techniques."
+      }
+    ]
+  }
+]

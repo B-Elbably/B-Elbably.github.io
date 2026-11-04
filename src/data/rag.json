@@ -1,0 +1,10 @@
+{
+  "title": "Mini RAG",
+  "kicker": "AI and retrieval",
+  "summary": "A mini retrieval-augmented generation (RAG) project: answering questions from retrieved documents instead of relying only on a model's memory.",
+  "impact": "",
+  "tech": [],
+  "repo": "",
+  "demo": "",
+  "todo": "Add what it does, the stack, and a repo or demo link here. The card hides the stack and links until they are filled in."
+}

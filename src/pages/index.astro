@@ -1,14 +1,15 @@
 ---
 import Base from '../layouts/Base.astro';
 import HeroArt from '../components/HeroArt.astro';
-import PixelPlanet from '../components/PixelPlanet.astro';
 import stats from '../data/stats.json';
 import projects from '../data/projects.json';
-import community from '../data/community.json';
+import volunteering from '../data/volunteering.json';
+import PixelPlanet from '../components/PixelPlanet.astro';
+import { rangeLabel } from '../lib/dates.js';
 import profiles from '../data/profiles.json';
 
 const desc =
-  'Belal Elbably: backend engineer, Codeforces Expert and president of ACPC Damietta. Real-time systems, algorithms and community building.';
+  'Belal Elbably: backend engineer, Codeforces Expert and Community Leader at ACPC Damietta. Real-time systems, algorithms and community building.';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -25,7 +26,35 @@ const taglines = [
   'Converting complex logic into high-performance systems.',
   '3,000+ problems solved. Codeforces Expert.',
   'Real-time backends with Node, Socket.IO and MongoDB.',
-  'President of ACPC Damietta University.',
+  'Community Leader at ACPC Damietta University.',
+];
+
+const featuredRoles = volunteering
+  .flatMap((o) => o.roles.filter((r) => r.featured).map((r) => ({ ...r, org: o.org })))
+  .sort((a, b) => b.start.localeCompare(a.start));
+
+const skillCards = [
+  {
+    href: '/skills#cp',
+    kicker: 'Skill 01',
+    title: 'Competitive programming',
+    text: 'Codeforces Expert, 3,000+ problems solved, IEEEXtreme and ECPC results.',
+    planet: { colors: ['#ffd23f', '#ff8a3d', '#8a3d1f'], ring: true, seed: 3, bands: false },
+  },
+  {
+    href: '/skills#software',
+    kicker: 'Skill 02',
+    title: 'Software engineering',
+    text: 'Real-time backends and web development, plus a mini RAG project.',
+    planet: { colors: ['#3df2e0', '#03a89e', '#07555a'], ring: false, seed: 7, bands: true },
+  },
+  {
+    href: '/skills#volunteering',
+    kicker: 'Skill 03',
+    title: 'Volunteering',
+    text: 'Mentoring, teaching and leading at ACPC and IEEE Damietta since 2024.',
+    planet: { colors: ['#ff9ad0', '#ff4fa3', '#7a1f57'], ring: false, seed: 11, bands: false },
+  },
 ];
 
 const [flagship, ...others] = projects;
@@ -79,6 +108,36 @@ const stackGroups = [
             </span>
             <span class="stat-note">{s.note}</span>
           </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="tree-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SKILL TREE</p>
+      <h2 id="tree-h">What I do</h2>
+    </div>
+    <div class="card-grid">
+      {
+        skillCards.map((c) => (
+          <a class="panel panel-hover skill-card" href={c.href}>
+            <div class="mission-planet">
+              <PixelPlanet
+                n={16}
+                scale={6}
+                colors={c.planet.colors as [string, string, string]}
+                ring={c.planet.ring}
+                bands={c.planet.bands}
+                seed={c.planet.seed}
+                class="planet-svg"
+              />
+            </div>
+            <p class="kicker">{c.kicker}</p>
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+            <span class="go-link">OPEN &gt;</span>
+          </a>
         ))
       }
     </div>
@@ -152,16 +211,16 @@ const stackGroups = [
     </div>
     <ol class="quest-log">
       {
-        community.map((c) => (
+        featuredRoles.map((c) => (
           <li class="quest">
-            <h3>{c.role}</h3>
-            <p class="org">{c.org}</p>
+            <h3>{c.title}</h3>
+            <p class="org">{c.org}, {rangeLabel(c.start, c.end)}</p>
             <p>{c.text}</p>
           </li>
         ))
       }
     </ol>
-    <div class="btn-row"><a class="btn btn-ghost" href="/community">Meet the crew</a></div>
+    <div class="btn-row"><a class="btn btn-ghost" href="/skills#volunteering">All roles</a></div>
   </section>
 
   <section class="section wrap reveal" aria-labelledby="cta-h">
