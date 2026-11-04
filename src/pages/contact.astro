@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import profiles from '../data/profiles.json';
+
+const links = [
+  { label: 'LinkedIn', href: profiles.linkedin, cls: 'btn' },
+  { label: 'GitHub', href: profiles.github, cls: 'btn btn-alt' },
+  { label: 'Codeforces', href: profiles.codeforces.main.url, cls: 'btn btn-ghost' },
+  { label: 'LeetCode', href: profiles.leetcode.url, cls: 'btn btn-ghost' },
+];
+const email = profiles.email;
+---
+
+<Base
+  title="Contact"
+  description="Contact Belal Elbably about internships, collaboration, mentoring and contests."
+>
+  <section class="section wrap">
+    <div class="section-head">
+      <p class="eyebrow">&gt; OPEN COMMS</p>
+      <h1>Contact</h1>
+      <p>Write to me about internships, collaboration, mentoring or contests. LinkedIn is the fastest way to reach me.</p>
+    </div>
+
+    <div class="contact-grid">
+      {links.map((l) => <a class={l.cls} href={l.href} rel="me noopener">{l.label}</a>)}
+      {
+        email && (
+          <a class="btn btn-alt" href={`mailto:${email}?subject=Hello%20Belal`}>
+            Email
+          </a>
+        )
+      }
+    </div>
+
+    <div class="panel" style="margin-top:32px">
+      <p class="term" style="margin:0">&gt; Based in Damietta, Egypt (UTC+2). Replies usually within a couple of days.</p>
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,115 @@
+---
+// A procedurally generated pixel planet: three-tone shading, craters or bands, optional ring.
+interface Props {
+  n?: number;
+  colors?: [string, string, string];
+  ring?: boolean;
+  ringColor?: string;
+  bands?: boolean;
+  seed?: number;
+  scale?: number;
+  class?: string;
+}
+
+const {
+  n = 24,
+  colors = ['#8f7bff', '#5a3fd1', '#2d1f7a'],
+  ring = false,
+  ringColor = '#ffd23f',
+  bands = false,
+  seed = 1,
+  scale = 4,
+  class: cls = '',
+} = Astro.props;
+
+const OUT = '#0b0f2a';
+let s = seed * 9301 + 49297;
+const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
+
+const r = n / 2 - 0.6;
+const c = (n - 1) / 2;
+const level: number[][] = [];
+const cells: (string | null)[][] = Array.from({ length: n }, () => Array(n).fill(null));
+
+for (let y = 0; y < n; y++) {
+  level[y] = [];
+  for (let x = 0; x < n; x++) {
+    const dx = x - c;
+    const dy = y - c;
+    const d = Math.hypot(dx, dy);
+    if (d > r) continue;
+    const light = (-0.65 * dx - 0.75 * dy) / r;
+    let lv = light > 0.35 ? 0 : light > -0.2 ? 1 : 2;
+    if (bands && Math.floor((y + 1) / 3) % 2 === 0) lv = Math.min(lv + 1, 2);
+    level[y][x] = lv;
+  }
+}
+
+if (!bands) {
+  const count = Math.max(3, Math.round(n / 6));
+  for (let i = 0; i < count; i++) {
+    const a = rnd() * Math.PI * 2;
+    const rad = rnd() * (r - 4);
+    const cx = Math.round(c + Math.cos(a) * rad);
+    const cy = Math.round(c + Math.sin(a) * rad);
+    for (const [ox, oy] of [[0, 0], [1, 0], [0, 1]]) {
+      const yy = cy + oy;
+      const xx = cx + ox;
+      if (level[yy]?.[xx] !== undefined) level[yy][xx] = Math.min(level[yy][xx] + 1, 2);
+    }
+  }
+}
+
+for (let y = 0; y < n; y++) {
+  for (let x = 0; x < n; x++) {
+    if (level[y]?.[x] === undefined) continue;
+    const d = Math.hypot(x - c, y - c);
+    cells[y][x] = d > r - 1 ? OUT : colors[level[y][x]];
+  }
+}
+
+if (ring) {
+  const rx = r * 1.55;
+  const ry = r * 0.34;
+  for (let y = 0; y < n; y++) {
+    for (let x = 0; x < n; x++) {
+      const dx = x - c;
+      const dy = y - c - 1;
+      const e = (dx * dx) / (rx * rx) + (dy * dy) / (ry * ry);
+      if (e >= 0.62 && e <= 1) {
+        const onPlanet = cells[y][x] !== null;
+        // The back half of the ring hides behind the planet.
+        if (dy < 0 && onPlanet) continue;
+        cells[y][x] = e > 0.9 || e < 0.7 ? '#b8821f' : ringColor;
+      }
+    }
+  }
+}
+
+const rects: { x: number; y: number; w: number; fill: string }[] = [];
+for (let y = 0; y < n; y++) {
+  let x = 0;
+  while (x < n) {
+    const fill = cells[y][x];
+    if (!fill) {
+      x++;
+      continue;
+    }
+    let end = x;
+    while (end + 1 < n && cells[y][end + 1] === fill) end++;
+    rects.push({ x, y, w: end - x + 1, fill });
+    x = end + 1;
+  }
+}
+---
+
+<svg
+  class={cls}
+  viewBox={`0 0 ${n} ${n}`}
+  width={n * scale}
+  height={n * scale}
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+>
+  {rects.map((q) => <rect x={q.x} y={q.y} width={q.w} height={1} fill={q.fill} />)}
+</svg>

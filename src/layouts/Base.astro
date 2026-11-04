@@ -1,0 +1,240 @@
+---
+import '@fontsource/press-start-2p/latin-400.css';
+import '@fontsource/vt323/latin-400.css';
+import '@fontsource-variable/inter/wght.css';
+import '../styles/global.css';
+
+import Starfield from '../components/Starfield.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
+}
+
+const { title, description, jsonLd, noindex = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL('/og.png', Astro.site).href;
+const fullTitle = title === 'Belal Elbably' ? 'Belal Elbably | Backend engineer and competitive programmer' : `${title} | Belal Elbably`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#070a1a" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {noindex && <meta name="robots" content="noindex" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Belal Elbably" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+
+    <!-- Runs before first paint: reduced-motion users start with motion off. -->
+    <script is:inline>
+      (function () {
+        var r = document.documentElement;
+        r.classList.add('js');
+        var m = 'on';
+        try {
+          var saved = localStorage.getItem('motion');
+          if (saved === 'on' || saved === 'off') m = saved;
+          else if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) m = 'off';
+        } catch (e) {}
+        r.dataset.motion = m;
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Starfield />
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      const root = document.documentElement;
+      const motionOn = () => root.dataset.motion !== 'off';
+
+      // ---- Motion toggle -------------------------------------------------
+      const mBtn = document.querySelector('[data-motion-toggle]');
+      const mLabel = document.querySelector('[data-motion-label]');
+      function syncMotionUI() {
+        const on = motionOn();
+        mBtn?.setAttribute('aria-pressed', String(on));
+        if (mLabel) mLabel.textContent = on ? 'MOTION ON' : 'MOTION OFF';
+      }
+      mBtn?.addEventListener('click', () => {
+        const next = motionOn() ? 'off' : 'on';
+        root.dataset.motion = next;
+        try {
+          localStorage.setItem('motion', next);
+        } catch (e) {}
+        syncMotionUI();
+        window.dispatchEvent(new Event('motionchange'));
+      });
+      syncMotionUI();
+
+      // ---- Mobile menu ---------------------------------------------------
+      const menuBtn = document.querySelector('[data-menu]');
+      menuBtn?.addEventListener('click', () => {
+        const open = menuBtn.getAttribute('aria-expanded') === 'true';
+        menuBtn.setAttribute('aria-expanded', String(!open));
+        document.querySelector('.site-header')?.toggleAttribute('data-open', !open);
+      });
+
+      // ---- Scroll reveal -------------------------------------------------
+      const reveals = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (e.isIntersecting) {
+                e.target.classList.add('in');
+                io.unobserve(e.target);
+              }
+            }
+          },
+          { threshold: 0.12 },
+        );
+        reveals.forEach((el) => io.observe(el));
+      } else {
+        reveals.forEach((el) => el.classList.add('in'));
+      }
+
+      // ---- Count-up stats (final number is in the HTML for no-JS) --------
+      const counters = document.querySelectorAll<HTMLElement>('[data-count]');
+      const fmt = (el: HTMLElement, v: number) =>
+        `${el.dataset.prefix ?? ''}${v.toLocaleString('en-US')}${el.dataset.suffix ?? ''}`;
+      if (motionOn()) counters.forEach((el) => (el.textContent = fmt(el, 0)));
+      if ('IntersectionObserver' in window) {
+        const cio = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries) {
+              if (!e.isIntersecting) continue;
+              const el = e.target as HTMLElement;
+              cio.unobserve(el);
+              const end = Number(el.dataset.count);
+              if (!motionOn()) {
+                el.textContent = fmt(el, end);
+                continue;
+              }
+              const steps = 22;
+              let i = 0;
+              const timer = setInterval(() => {
+                i++;
+                el.textContent = fmt(el, Math.round((end * i) / steps));
+                if (i >= steps) clearInterval(timer);
+              }, 45);
+            }
+          },
+          { threshold: 0.4 },
+        );
+        counters.forEach((el) => cio.observe(el));
+      } else {
+        counters.forEach((el) => (el.textContent = fmt(el, Number(el.dataset.count))));
+      }
+
+      // ---- Typing tagline ------------------------------------------------
+      document.querySelectorAll<HTMLElement>('[data-typing]').forEach((host) => {
+        const lines: string[] = JSON.parse(host.dataset.lines ?? '[]');
+        const out = host.querySelector('.typed');
+        if (!out || lines.length === 0) return;
+        let li = 0;
+        let ci = 0;
+        let deleting = false;
+        let timer: number | undefined;
+
+        function tick() {
+          if (!motionOn()) {
+            out!.textContent = lines[0];
+            return;
+          }
+          const line = lines[li];
+          if (!deleting) {
+            ci++;
+            out!.textContent = line.slice(0, ci);
+            if (ci >= line.length) {
+              deleting = true;
+              timer = window.setTimeout(tick, 1700);
+              return;
+            }
+            timer = window.setTimeout(tick, 55);
+          } else {
+            ci--;
+            out!.textContent = line.slice(0, ci);
+            if (ci <= 0) {
+              deleting = false;
+              li = (li + 1) % lines.length;
+              timer = window.setTimeout(tick, 350);
+              return;
+            }
+            timer = window.setTimeout(tick, 24);
+          }
+        }
+        function restart() {
+          window.clearTimeout(timer);
+          li = 0;
+          ci = 0;
+          deleting = false;
+          if (motionOn()) tick();
+          else out!.textContent = lines[0];
+        }
+        window.addEventListener('motionchange', restart);
+        restart();
+      });
+
+      // ---- Project filter ------------------------------------------------
+      const chips = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+      const cards = document.querySelectorAll<HTMLElement>('[data-project]');
+      chips.forEach((chip) =>
+        chip.addEventListener('click', () => {
+          const f = chip.dataset.filter;
+          chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+          cards.forEach((card) => {
+            const tags = (card.dataset.tags ?? '').split(' ');
+            card.hidden = !(f === 'all' || tags.includes(f ?? ''));
+          });
+        }),
+      );
+
+      // ---- Konami code: meteor shower -----------------------------------
+      const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+      let pos = 0;
+      window.addEventListener('keydown', (e) => {
+        const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+        pos = k === code[pos] ? pos + 1 : k === code[0] ? 1 : 0;
+        if (pos === code.length) {
+          pos = 0;
+          window.dispatchEvent(new Event('meteors'));
+          const toast = document.createElement('div');
+          toast.className = 'toast';
+          toast.setAttribute('role', 'status');
+          toast.textContent = motionOn() ? 'METEOR SHOWER!' : 'Turn motion on for the meteor shower.';
+          document.body.appendChild(toast);
+          setTimeout(() => toast.remove(), 3200);
+        }
+      });
+    </script>
+  </body>
+</html>

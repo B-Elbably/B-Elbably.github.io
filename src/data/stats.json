@@ -1,0 +1,8 @@
+[
+  { "label": "Problems solved", "value": 3000, "suffix": "+", "note": "across major online judges" },
+  { "label": "Codeforces max", "value": 1646, "note": "rated Expert" },
+  { "label": "IEEEXtreme", "value": 911, "prefix": "#", "note": "global rank" },
+  { "label": "ECPC qualifier", "value": 18, "prefix": "#", "suffix": "/300+", "note": "university rank" },
+  { "label": "Students taught", "value": 500, "suffix": "+", "note": "DSA curriculum" },
+  { "label": "Mentors led", "value": 40, "note": "mentors and problem setters" }
+]

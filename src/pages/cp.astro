@@ -1,0 +1,95 @@
+---
+import Base from '../layouts/Base.astro';
+import RankLadder from '../components/RankLadder.astro';
+import profiles from '../data/profiles.json';
+
+const cards = [
+  {
+    name: 'Codeforces',
+    handle: profiles.codeforces.main.handle,
+    text: `Expert, max rating ${profiles.codeforces.maxRating}. Alternate account: ${profiles.codeforces.alt.handle}.`,
+    url: profiles.codeforces.main.url,
+  },
+  {
+    name: 'CSES',
+    handle: `User ${profiles.cses.handle}`,
+    text: 'The CSES problem set for core algorithmic techniques.',
+    url: profiles.cses.url,
+  },
+  {
+    name: 'LeetCode',
+    handle: profiles.leetcode.handle,
+    text: 'Interview-style practice alongside contest work.',
+    url: profiles.leetcode.url,
+  },
+];
+
+const strengths = [
+  { t: 'Graph theory', d: 'Shortest paths, flows, trees and the structure problems hide inside.' },
+  { t: 'Dynamic programming', d: 'Bitmask DP, tree DP and convex hull trick optimizations.' },
+  { t: 'Data structures', d: 'Segment trees and sparse tables for range queries.' },
+  { t: 'Contest results', d: 'IEEEXtreme global rank 911 and ECPC university qualifier rank 18 of 300+.' },
+];
+---
+
+<Base
+  title="Arena"
+  description="Belal Elbably's competitive programming profile: Codeforces Expert, 3,000+ problems solved, IEEEXtreme and ECPC results."
+>
+  <section class="section wrap">
+    <div class="section-head">
+      <p class="eyebrow">&gt; THE ARENA</p>
+      <h1>Competitive programming</h1>
+      <p>Over 3,000 problems solved across major online judges. These are the profiles where it can be checked.</p>
+    </div>
+    <RankLadder />
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="profiles-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; PLAYER PROFILES</p>
+      <h2 id="profiles-h">Where to verify</h2>
+    </div>
+    <div class="card-grid">
+      {
+        cards.map((c) => (
+          <article class="panel panel-hover profile">
+            <h3>{c.name}</h3>
+            <p class="handle">{c.handle}</p>
+            <p>{c.text}</p>
+            <a class="go" href={c.url} rel="noopener">OPEN PROFILE &gt;</a>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="moves-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SPECIAL MOVES</p>
+      <h2 id="moves-h">Strengths</h2>
+    </div>
+    <div class="moves">
+      {
+        strengths.map((s) => (
+          <div class="panel move">
+            <h3>{s.t}</h3>
+            <p>{s.d}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="rail-h">
+    <div class="panel cta">
+      <h2 id="rail-h">Railway to ACPC</h2>
+      <p class="muted">
+        An 8-month roadmap and a library of 50+ optimized C++ templates for national-level contest preparation.
+      </p>
+      <div class="btn-row">
+        <a class="btn btn-alt" href="https://github.com/B-Elbably/Railway-to-ACPC" rel="noopener">Open the repo</a>
+      </div>
+    </div>
+  </section>
+</Base>

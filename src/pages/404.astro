@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelSprite from '../components/PixelSprite.astro';
+import { astronaut } from '../lib/sprites.js';
+---
+
+<Base title="Lost in space" description="This page drifted out of orbit." noindex>
+  <section class="wrap lost">
+    <div class="astro-float" aria-hidden="true">
+      <PixelSprite rows={astronaut} scale={10} class="astro-svg" />
+    </div>
+    <p class="eyebrow">&gt; ERROR 404</p>
+    <h1>Lost in space</h1>
+    <p class="lead" style="margin-inline:auto">This page drifted out of orbit. Head back to base.</p>
+    <div class="btn-row" style="justify-content:center">
+      <a class="btn" href="/">Return home</a>
+    </div>
+  </section>
+</Base>

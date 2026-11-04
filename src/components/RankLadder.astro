@@ -1,0 +1,39 @@
+---
+// Codeforces rank ladder. Tier thresholds are Codeforces' published rating bands.
+// The scale starts at 800 only so the bar has room; the marker is the user's max rating.
+import profiles from '../data/profiles.json';
+
+const min = 800;
+const max = 2100;
+const tiers = [
+  { name: 'Newbie', from: 800, to: 1200, color: '#8c8c9a' },
+  { name: 'Pupil', from: 1200, to: 1400, color: '#3fbf5f' },
+  { name: 'Specialist', from: 1400, to: 1600, color: '#03a89e' },
+  { name: 'Expert', from: 1600, to: 1900, color: '#4c6dff' },
+  { name: 'Candidate Master', from: 1900, to: 2100, color: '#c056d6' },
+];
+const rating = profiles.codeforces.maxRating;
+const pct = (v: number) => ((v - min) / (max - min)) * 100;
+---
+
+<figure class="ladder" aria-label={`Codeforces max rating ${rating}, tier Expert`}>
+  <div class="ladder-bar">
+    {
+      tiers.map((t) => (
+        <div
+          class:list={['tier', { 'tier-on': rating >= t.from && rating < t.to }]}
+          style={`width:${pct(t.to) - pct(t.from)}%;--tier:${t.color}`}
+        >
+          <span class="tier-name">{t.name}</span>
+        </div>
+      ))
+    }
+    <div class="ladder-marker" style={`left:${pct(rating)}%`}>
+      <span class="marker-flag">{rating}</span>
+      <span class="marker-pin"></span>
+    </div>
+  </div>
+  <figcaption>
+    Max rating {rating} puts the player in the Expert tier (1600 to 1899). Bar scale starts at 800.
+  </figcaption>
+</figure>
