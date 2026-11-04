@@ -1,0 +1,79 @@
+---
+// A to-scale chart of volunteering roles: one bar per role, positioned by its start and end month.
+import { monthIndex, monthLabel, rangeLabel, currentMonth } from '../lib/dates.js';
+
+interface Role {
+  title: string;
+  start: string;
+  end: string | null;
+}
+interface Org {
+  id: string;
+  short: string;
+  roles: Role[];
+}
+interface Props {
+  orgs: Org[];
+}
+
+const { orgs } = Astro.props;
+const now = currentMonth();
+
+const rows = orgs.flatMap((o) =>
+  o.roles.map((r) => ({
+    org: o.id,
+    short: o.short,
+    title: r.title,
+    from: monthIndex(r.start),
+    // end month is inclusive, so the bar runs to the start of the following month
+    to: monthIndex(r.end ?? now) + 1,
+    present: r.end === null,
+    label: rangeLabel(r.start, r.end),
+  })),
+);
+
+const min = Math.min(...rows.map((r) => r.from));
+const max = Math.max(...rows.map((r) => r.to));
+const span = max - min;
+const pct = (v: number) => ((v - min) / span) * 100;
+
+// a tick every 6 months from the first month
+const ticks: { left: number; label: string }[] = [];
+for (let m = min; m < max; m += 6) {
+  const y = Math.floor(m / 12);
+  const mo = (m % 12) + 1;
+  ticks.push({ left: pct(m), label: monthLabel(`${y}-${String(mo).padStart(2, '0')}`) });
+}
+---
+
+<figure class="gantt" aria-label="Volunteering roles over time">
+  <ul class="legend">
+    {orgs.map((o) => <li class={`lg lg-${o.id}`}>{o.short}</li>)}
+  </ul>
+
+  <div class="gantt-axis" aria-hidden="true">
+    {ticks.map((t) => <span style={`left:${t.left}%`}>{t.label}</span>)}
+  </div>
+
+  <ul class="gantt-rows">
+    {
+      rows.map((r) => (
+        <li class="gantt-row">
+          <div class="gantt-label">
+            <span class="gantt-title">{r.title}</span>
+            <span class="gantt-dates">
+              {r.short}, {r.label}
+            </span>
+          </div>
+          <div class="gantt-track" aria-hidden="true">
+            {ticks.map((t) => <i class="gantt-grid" style={`left:${t.left}%`} />)}
+            <span
+              class:list={['gantt-bar', `bar-${r.org}`, { 'bar-now': r.present }]}
+              style={`left:${pct(r.from)}%;width:${pct(r.to) - pct(r.from)}%`}
+            />
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</figure>

@@ -1,0 +1,215 @@
+---
+import Base from '../layouts/Base.astro';
+import MissionCard from '../components/MissionCard.astro';
+import RankLadder from '../components/RankLadder.astro';
+import RoleTimeline from '../components/RoleTimeline.astro';
+import stats from '../data/stats.json';
+import projects from '../data/projects.json';
+import profiles from '../data/profiles.json';
+import volunteering from '../data/volunteering.json';
+import rag from '../data/rag.json';
+import { rangeLabel } from '../lib/dates.js';
+
+const cpStats = stats.filter((s) => ['Problems solved', 'Codeforces max', 'IEEEXtreme', 'ECPC qualifier'].includes(s.label));
+const topics = ['Graph theory', 'Dynamic programming', 'Bitmask DP', 'Tree DP', 'Convex hull trick', 'Segment trees', 'Sparse tables'];
+
+const webProjects = projects.filter((p) => ['acpc-du-echo', 'acpc-damietta-website'].includes(p.id));
+const railway = projects.find((p) => p.id === 'railway-to-acpc')!;
+
+const buildBlocks = [
+  { t: 'Real-time systems', d: 'WebSocket-driven live synchronization with Socket.IO, as in ACPC-DU Echo.' },
+  { t: 'APIs and auth', d: 'RESTful APIs with Express and JWT authentication.' },
+  { t: 'Data layer', d: 'MongoDB aggregation pipelines tuned for low latency, plus PostgreSQL, MySQL, Redis and Neo4j.' },
+  { t: 'Shipping', d: 'Docker and Linux, unit tests with Jest, deployed on Vercel and Railway.' },
+];
+const stackGroups = [
+  { name: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'SQL', 'C++'] },
+  { name: 'Backend', items: ['Node.js', 'Express', 'Socket.IO', 'REST APIs', 'JWT', 'Cron jobs'] },
+  { name: 'Databases', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Neo4j', 'Redis', 'SQL Server'] },
+  { name: 'Environment', items: ['Git', 'Docker', 'Linux', 'Vercel', 'Railway', 'Jest'] },
+];
+
+const jump = [
+  { href: '#cp', label: 'Competitive programming' },
+  { href: '#software', label: 'Software engineering' },
+  { href: '#volunteering', label: 'Volunteering' },
+];
+
+const ragPlanet = { colors: ['#ff9ad0', '#ff4fa3', '#7a1f57'], ring: true, seed: 21, bands: true };
+---
+
+<Base
+  title="Skills"
+  description="Belal Elbably's skill tree: competitive programming, software engineering (web development and a mini RAG project) and volunteering at ACPC and IEEE Damietta."
+>
+  <section class="section wrap">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SKILL TREE</p>
+      <h1>Skills</h1>
+      <p>Three areas I work in, each with proof you can open.</p>
+    </div>
+    <nav aria-label="Skill sections">
+      <ul class="chips jump">
+        {jump.map((j) => <li><a class="chip chip-link" href={j.href}>{j.label}</a></li>)}
+      </ul>
+    </nav>
+  </section>
+
+  <!-- ===================== Competitive programming ===================== -->
+  <section id="cp" class="section wrap reveal" aria-labelledby="cp-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SKILL 01</p>
+      <h2 id="cp-h">Competitive programming</h2>
+      <p>Over 3,000 problems solved across major online judges, with ratings and contest ranks that can be checked.</p>
+    </div>
+
+    <div class="stat-grid stat-grid-4">
+      {
+        cpStats.map((s) => (
+          <div class="panel stat">
+            <span class="stat-label">{s.label}</span>
+            <span class="stat-value" data-count={s.value} data-prefix={s.prefix ?? ''} data-suffix={s.suffix ?? ''}>
+              {`${s.prefix ?? ''}${s.value.toLocaleString('en-US')}${s.suffix ?? ''}`}
+            </span>
+            <span class="stat-note">{s.note}</span>
+          </div>
+        ))
+      }
+    </div>
+
+    <RankLadder />
+
+    <h3 class="sub-head">Topics I go deep on</h3>
+    <ul class="chips">
+      {topics.map((t) => <li class="chip">{t}</li>)}
+    </ul>
+
+    <h3 class="sub-head">Resource I built</h3>
+    <div class="mission-grid">
+      <MissionCard
+        title={railway.title}
+        kicker={railway.kicker}
+        summary={railway.summary}
+        impact={railway.impact}
+        tech={railway.tech}
+        repo={railway.repo}
+        planet={railway.planet}
+        wide
+      />
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href={profiles.codeforces.main.url} rel="me noopener">Codeforces</a>
+      <a class="btn btn-ghost" href={profiles.cses.url} rel="me noopener">CSES</a>
+      <a class="btn btn-ghost" href={profiles.leetcode.url} rel="me noopener">LeetCode</a>
+      <a class="btn btn-ghost" href="/cp">Full arena page</a>
+    </div>
+  </section>
+
+  <!-- ===================== Software engineering ===================== -->
+  <section id="software" class="section wrap reveal" aria-labelledby="sw-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SKILL 02</p>
+      <h2 id="sw-h">Software engineering</h2>
+      <p>Backend-first web development, plus a mini RAG project on the AI side.</p>
+    </div>
+
+    <h3 class="sub-head">Web development</h3>
+    <div class="moves">
+      {
+        buildBlocks.map((b) => (
+          <div class="panel move">
+            <h4>{b.t}</h4>
+            <p>{b.d}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="mission-grid" style="margin-top:24px">
+      {
+        webProjects.map((p) => (
+          <MissionCard
+            title={p.title}
+            kicker={p.kicker}
+            summary={p.summary}
+            impact={p.impact}
+            tech={p.tech}
+            repo={p.repo}
+            demo={p.demo}
+            planet={p.planet}
+          />
+        ))
+      }
+    </div>
+
+    <h3 class="sub-head">Mini RAG</h3>
+    <div class="mission-grid">
+      <MissionCard
+        title={rag.title}
+        kicker={rag.kicker}
+        summary={rag.summary}
+        impact={rag.impact}
+        tech={rag.tech}
+        repo={rag.repo}
+        demo={rag.demo}
+        planet={ragPlanet}
+        wide
+      />
+    </div>
+
+    <h3 class="sub-head">Stack</h3>
+    <div class="skill-grid">
+      {
+        stackGroups.map((g) => (
+          <div class="panel">
+            <h4>{g.name}</h4>
+            <ul class="chips">
+              {g.items.map((i) => <li class="chip">{i}</li>)}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="btn-row">
+      <a class="btn" href="/projects">All missions</a>
+      <a class="btn btn-ghost" href={profiles.github} rel="me noopener">GitHub</a>
+    </div>
+  </section>
+
+  <!-- ===================== Volunteering ===================== -->
+  <section id="volunteering" class="section wrap reveal" aria-labelledby="vol-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; SKILL 03</p>
+      <h2 id="vol-h">Volunteering</h2>
+      <p>
+        Teaching, problem setting and leading student communities at ACPC Damietta University and the IEEE Damietta
+        Branch since September 2024.
+      </p>
+    </div>
+
+    <RoleTimeline orgs={volunteering} />
+
+    {
+      volunteering.map((o) => (
+        <div class="vol-org">
+          <h3 class="sub-head">{o.org}</h3>
+          <ol class="quest-log">
+            {[...o.roles]
+              .sort((a, b) => b.start.localeCompare(a.start))
+              .map((r) => (
+                <li class="quest">
+                  <h4>{r.title}</h4>
+                  <p class="org">{rangeLabel(r.start, r.end)}</p>
+                  <p>{r.text}</p>
+                </li>
+              ))}
+          </ol>
+        </div>
+      ))
+    }
+
+    <div class="btn-row"><a class="btn btn-ghost" href="/community">Meet the crew</a></div>
+  </section>
+</Base>

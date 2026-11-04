@@ -2,12 +2,13 @@
 import Base from '../layouts/Base.astro';
 import PixelSprite from '../components/PixelSprite.astro';
 import { astronaut } from '../lib/sprites.js';
-import community from '../data/community.json';
+import volunteering from '../data/volunteering.json';
+import { rangeLabel } from '../lib/dates.js';
 ---
 
 <Base
   title="Crew"
-  description="Leadership and mentoring by Belal Elbably: president of ACPC Damietta University, DSA curriculum for 500+ students, IEEE Damietta CP committee."
+  description="Leadership and mentoring by Belal Elbably: Community Leader at ACPC Damietta University, DSA curriculum for 500+ students, IEEE Damietta CP committee."
 >
   <section class="section wrap">
     <div class="hero-grid" style="align-items:start">
@@ -20,17 +21,24 @@ import community from '../data/community.json';
             entire learning systems.
           </p>
         </div>
-        <ol class="quest-log">
-          {
-            community.map((c) => (
-              <li class="quest">
-                <h2 style="font-size:0.8rem">{c.role}</h2>
-                <p class="org">{c.org}</p>
-                <p>{c.text}</p>
-              </li>
-            ))
-          }
-        </ol>
+        {
+          volunteering.map((o) => (
+            <div>
+              <h2 class="sub-head" style="font-size:0.75rem">{o.org}</h2>
+              <ol class="quest-log">
+                {[...o.roles]
+                  .sort((a, b) => b.start.localeCompare(a.start))
+                  .map((r) => (
+                    <li class="quest">
+                      <h3>{r.title}</h3>
+                      <p class="org">{rangeLabel(r.start, r.end)}</p>
+                      <p>{r.text}</p>
+                    </li>
+                  ))}
+              </ol>
+            </div>
+          ))
+        }
       </div>
       <div aria-hidden="true" style="display:grid;place-items:center">
         <div class="astro-float" style="position:relative;left:auto;bottom:auto;width:min(60%,240px)">

@@ -1,0 +1,57 @@
+---
+import PixelPlanet from './PixelPlanet.astro';
+
+interface Props {
+  title: string;
+  kicker: string;
+  summary: string;
+  impact?: string;
+  tech?: string[];
+  repo?: string;
+  demo?: string;
+  planet: { colors: string[]; ring: boolean; seed: number; bands: boolean };
+  wide?: boolean;
+  headingLevel?: 'h3' | 'h4';
+}
+
+const { title, kicker, summary, impact = '', tech = [], repo = '', demo = '', planet, wide = false, headingLevel = 'h4' } =
+  Astro.props;
+const Heading = headingLevel;
+---
+
+<article class:list={['panel', 'panel-hover', 'mission', { wide }]}>
+  <div class="mission-top">
+    <div class="mission-planet">
+      <PixelPlanet
+        n={wide ? 20 : 16}
+        scale={6}
+        colors={planet.colors as [string, string, string]}
+        ring={planet.ring}
+        bands={planet.bands}
+        seed={planet.seed}
+        class="planet-svg"
+      />
+    </div>
+    <div>
+      <p class="kicker">{kicker}</p>
+      <Heading>{title}</Heading>
+    </div>
+  </div>
+  <p>{summary}</p>
+  {impact && <p class="impact">{impact}</p>}
+  {
+    tech.length > 0 && (
+      <ul class="chips" aria-label="Technologies">
+        {tech.map((t) => <li class="chip">{t}</li>)}
+      </ul>
+    )
+  }
+  {
+    (repo || demo) && (
+      <div class="mission-links">
+        {repo && <a href={repo} rel="noopener">SOURCE &gt;</a>}
+        {demo && <a href={demo} rel="noopener">LIVE &gt;</a>}
+      </div>
+    )
+  }
+</article>
