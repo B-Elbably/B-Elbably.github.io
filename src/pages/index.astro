@@ -11,17 +11,6 @@ import profiles from '../data/profiles.json';
 const desc =
   'Belal Elbably: backend engineer, Codeforces Expert and Community Leader at ACPC Damietta. Real-time systems, algorithms and community building.';
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Belal Elbably',
-  url: 'https://bably.me',
-  jobTitle: 'Software Engineer',
-  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Damietta University' },
-  address: { '@type': 'PostalAddress', addressLocality: 'Damietta', addressCountry: 'EG' },
-  sameAs: [profiles.github, profiles.linkedin, profiles.codeforces.main.url, profiles.leetcode.url],
-};
-
 const taglines = [
   'Converting complex logic into high-performance systems.',
   '3,000+ problems solved. Codeforces Expert.',
@@ -66,7 +55,7 @@ const stackGroups = [
 ];
 ---
 
-<Base title="Belal Elbably" description={desc} jsonLd={jsonLd}>
+<Base title="Belal Elbably" description={desc} pageType="ProfilePage" ogType="profile">
   <section class="hero">
     <div class="wrap hero-grid">
       <div>

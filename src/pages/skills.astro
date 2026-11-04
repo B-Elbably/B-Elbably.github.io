@@ -9,9 +9,10 @@ import profiles from '../data/profiles.json';
 import volunteering from '../data/volunteering.json';
 import rag from '../data/rag.json';
 import { rangeLabel } from '../lib/dates.js';
+import { CP_TOPICS, STACK_GROUPS } from '../lib/site.js';
 
 const cpStats = stats.filter((s) => ['Problems solved', 'Codeforces max', 'IEEEXtreme', 'ECPC qualifier'].includes(s.label));
-const topics = ['Graph theory', 'Dynamic programming', 'Bitmask DP', 'Tree DP', 'Convex hull trick', 'Segment trees', 'Sparse tables'];
+const topics = CP_TOPICS;
 
 const webProjects = projects.filter((p) => ['acpc-du-echo', 'acpc-damietta-website'].includes(p.id));
 const railway = projects.find((p) => p.id === 'railway-to-acpc')!;
@@ -22,12 +23,7 @@ const buildBlocks = [
   { t: 'Data layer', d: 'MongoDB aggregation pipelines tuned for low latency, plus PostgreSQL, MySQL, Redis and Neo4j.' },
   { t: 'Shipping', d: 'Docker and Linux, unit tests with Jest, deployed on Vercel and Railway.' },
 ];
-const stackGroups = [
-  { name: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'SQL', 'C++'] },
-  { name: 'Backend', items: ['Node.js', 'Express', 'Socket.IO', 'REST APIs', 'JWT', 'Cron jobs'] },
-  { name: 'Databases', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Neo4j', 'Redis', 'SQL Server'] },
-  { name: 'Environment', items: ['Git', 'Docker', 'Linux', 'Vercel', 'Railway', 'Jest'] },
-];
+const stackGroups = STACK_GROUPS;
 
 const jump = [
   { href: '#cp', label: 'Competitive programming' },
@@ -39,8 +35,9 @@ const ragPlanet = { colors: ['#ff9ad0', '#ff4fa3', '#7a1f57'], ring: true, seed:
 ---
 
 <Base
-  title="Skills"
-  description="Belal Elbably's skill tree: competitive programming, software engineering (web development and a mini RAG project) and volunteering at ACPC and IEEE Damietta."
+  title="Skills and experience"
+  crumb="Skills"
+  description="Belal Elbably's skills: competitive programming, backend and web development, a mini RAG project, and volunteering at ACPC and IEEE Damietta."
 >
   <section class="section wrap">
     <div class="section-head">

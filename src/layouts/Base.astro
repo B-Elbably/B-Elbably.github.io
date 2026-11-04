@@ -7,18 +7,75 @@ import '../styles/global.css';
 import Starfield from '../components/Starfield.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import profiles from '../data/profiles.json';
+import {
+  NAME,
+  OG_IMAGE,
+  OG_IMAGE_ALT,
+  PERSON_ID,
+  WEBSITE_ID,
+  breadcrumbNode,
+  lastModified,
+  personNode,
+  serializeJsonLd,
+  url,
+  websiteNode,
+} from '../lib/site.js';
 
 interface Props {
   title: string;
   description: string;
-  jsonLd?: Record<string, unknown>;
+  /** schema.org type of this page. */
+  pageType?: 'WebPage' | 'ProfilePage' | 'CollectionPage' | 'ContactPage' | 'AboutPage';
+  /** Label for this page in the breadcrumb trail (defaults to the title). */
+  crumb?: string;
+  /** Extra schema.org nodes for this page, added to the JSON-LD graph. */
+  graph?: Record<string, unknown>[];
+  /** Open Graph type; the home page uses "profile". */
+  ogType?: 'website' | 'profile';
   noindex?: boolean;
 }
 
-const { title, description, jsonLd, noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  pageType = 'WebPage',
+  crumb,
+  graph = [],
+  ogType = 'website',
+  noindex = false,
+} = Astro.props;
+
+const isHome = Astro.url.pathname === '/';
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
-const ogImage = new URL('/og.png', Astro.site).href;
-const fullTitle = title === 'Belal Elbably' ? 'Belal Elbably | Backend engineer and competitive programmer' : `${title} | Belal Elbably`;
+const ogImage = url(OG_IMAGE.path);
+const fullTitle = isHome ? `${NAME} | Backend engineer and competitive programmer` : `${title} | ${NAME}`;
+const robots = noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1';
+
+// One JSON-LD graph per page: site, person, the page itself, breadcrumbs and any page-specific nodes.
+// The full Person node is repeated on every page on purpose: crawlers read pages independently.
+const pageNode = {
+  '@type': pageType,
+  '@id': `${canonical}#webpage`,
+  url: canonical,
+  name: fullTitle,
+  description,
+  inLanguage: 'en',
+  isPartOf: { '@id': WEBSITE_ID },
+  ...(pageType === 'ProfilePage' ? { mainEntity: { '@id': PERSON_ID } } : { about: { '@id': PERSON_ID } }),
+  primaryImageOfPage: { '@type': 'ImageObject', url: ogImage, width: OG_IMAGE.width, height: OG_IMAGE.height },
+  ...(lastModified ? { dateModified: lastModified } : {}),
+  ...(isHome ? {} : { breadcrumb: { '@id': `${canonical}#breadcrumb` } }),
+};
+const jsonLd = noindex
+  ? undefined
+  : serializeJsonLd([
+      websiteNode(),
+      personNode(),
+      pageNode,
+      ...(isHome ? [] : [breadcrumbNode(canonical, crumb ?? title)]),
+      ...graph,
+    ]);
 ---
 
 <!doctype html>
@@ -28,25 +85,41 @@ const fullTitle = title === 'Belal Elbably' ? 'Belal Elbably | Backend engineer 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={NAME} />
+    <meta name="robots" content={robots} />
     <meta name="theme-color" content="#070a1a" />
-    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="canonical" href={canonical} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="Summary for language models (llms.txt)" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Belal Elbably" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={NAME} />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content={String(OG_IMAGE.width)} />
+    <meta property="og:image:height" content={String(OG_IMAGE.height)} />
+    <meta property="og:image:alt" content={OG_IMAGE_ALT} />
+    {
+      ogType === 'profile' && (
+        <>
+          <meta property="profile:first_name" content="Belal" />
+          <meta property="profile:last_name" content="Elbably" />
+          <meta property="profile:username" content={profiles.handle} />
+        </>
+      )
+    }
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={OG_IMAGE_ALT} />
 
-    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
 
     <!-- Runs before first paint: reduced-motion users start with motion off. -->
     <script is:inline>

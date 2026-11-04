@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import PixelPlanet from '../components/PixelPlanet.astro';
 import projects from '../data/projects.json';
+import { PERSON_ID, url } from '../lib/site.js';
 
 const filters = [
   { id: 'all', label: 'All' },
@@ -9,11 +10,35 @@ const filters = [
   { id: 'algorithms', label: 'Algorithms' },
   { id: 'web', label: 'Web' },
 ];
+
+const graph = [
+  {
+    '@type': 'ItemList',
+    '@id': `${url('/projects/')}#projects`,
+    name: 'Projects by Belal Elbably',
+    itemListElement: projects
+      .filter((p) => p.repo)
+      .map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        item: {
+          '@type': 'SoftwareSourceCode',
+          name: p.title,
+          description: [p.summary, p.impact].filter(Boolean).join(' '),
+          codeRepository: p.repo,
+          keywords: p.tech.join(', '),
+          author: { '@id': PERSON_ID },
+        },
+      })),
+  },
+];
 ---
 
 <Base
-  title="Missions"
-  description="Projects by Belal Elbably: a real-time ranking backend, an algorithms library for ACPC preparation and a community website."
+  title="Projects"
+  pageType="CollectionPage"
+  graph={graph}
+  description="Projects by Belal Elbably: a real-time ranking backend (Node.js, Socket.IO, MongoDB), a C++ algorithms library for ACPC preparation and a community website."
 >
   <section class="section wrap">
     <div class="section-head">

@@ -17,10 +17,26 @@ npm run preview  # serves dist/
 | --- | --- |
 | Scoreboard numbers | `src/data/stats.json` |
 | Projects and their pixel planets | `src/data/projects.json` |
-| Leadership timeline | `src/data/community.json` |
+| Leadership and volunteering roles | `src/data/volunteering.json` |
+| Mini RAG project card | `src/data/rag.json` |
 | Handles, links, public email | `src/data/profiles.json` |
 
 To show an email button on the Contact page, set `email` in `src/data/profiles.json`. Add a `demo` URL to a project to show a LIVE link on its card.
+
+## SEO and GEO
+
+Search and AI-answer-engine metadata is generated from the same data files, so it stays in sync with the pages.
+
+| What | Where |
+| --- | --- |
+| Title, description, canonical, Open Graph, Twitter, robots meta | `src/layouts/Base.astro` (props set per page) |
+| JSON-LD graph (WebSite, Person, page type, breadcrumbs, project list) | `src/layouts/Base.astro` and `src/lib/site.js` |
+| Site facts reused everywhere (name, tagline, pages, stack, topics) | `src/lib/site.js` |
+| `/llms.txt` and `/llms-full.txt` for language models | `src/pages/llms.txt.ts`, `src/pages/llms-full.txt.ts` |
+| Crawler rules and sitemap link | `public/robots.txt` |
+| Sitemap (`/sitemap-index.xml`, 404 excluded, `lastmod` from the latest commit) | `astro.config.mjs` |
+
+When you add a page, give `Base` a descriptive `title` and `description`, add the page to `PAGES` in `src/lib/site.js` so it appears in `llms.txt`, and link it in the header. To opt an AI crawler out, edit its group in `public/robots.txt`.
 
 ## Design
 
