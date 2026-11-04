@@ -1,0 +1,44 @@
+---
+import { PAL } from '../lib/sprites.js';
+
+interface Props {
+  rows: string[];
+  scale?: number;
+  class?: string;
+  label?: string;
+}
+
+const { rows, scale = 4, class: cls = '', label = '' } = Astro.props;
+const h = rows.length;
+const w = Math.max(...rows.map((r) => r.length));
+
+// Merge horizontal runs of the same colour so the SVG stays small.
+const rects: { x: number; y: number; w: number; fill: string }[] = [];
+rows.forEach((row, y) => {
+  let x = 0;
+  while (x < row.length) {
+    const ch = row[x];
+    if (ch === '.' || !PAL[ch as keyof typeof PAL]) {
+      x++;
+      continue;
+    }
+    let end = x;
+    while (end + 1 < row.length && row[end + 1] === ch) end++;
+    rects.push({ x, y, w: end - x + 1, fill: PAL[ch as keyof typeof PAL] });
+    x = end + 1;
+  }
+});
+---
+
+<svg
+  class={cls}
+  viewBox={`0 0 ${w} ${h}`}
+  width={w * scale}
+  height={h * scale}
+  shape-rendering="crispEdges"
+  role={label ? 'img' : undefined}
+  aria-label={label || undefined}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {rects.map((r) => <rect x={r.x} y={r.y} width={r.w} height={1} fill={r.fill} />)}
+</svg>

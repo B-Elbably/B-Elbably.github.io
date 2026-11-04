@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelPlanet from '../components/PixelPlanet.astro';
+import projects from '../data/projects.json';
+
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'backend', label: 'Backend' },
+  { id: 'algorithms', label: 'Algorithms' },
+  { id: 'web', label: 'Web' },
+];
+---
+
+<Base
+  title="Missions"
+  description="Projects by Belal Elbably: a real-time ranking backend, an algorithms library for ACPC preparation and a community website."
+>
+  <section class="section wrap">
+    <div class="section-head">
+      <p class="eyebrow">&gt; MISSION CONTROL</p>
+      <h1>Missions</h1>
+      <p>Each mission lists what it does, what I built and the stack behind it.</p>
+    </div>
+
+    <div class="chips" role="group" aria-label="Filter missions" style="margin-bottom:28px">
+      {
+        filters.map((f) => (
+          <button class="chip" type="button" data-filter={f.id} aria-pressed={f.id === 'all' ? 'true' : 'false'}>
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="mission-grid">
+      {
+        projects.map((p, i) => (
+          <article
+            class:list={['panel', 'panel-hover', 'mission', { wide: i === 0 }]}
+            data-project
+            data-tags={p.tags.join(' ')}
+          >
+            <div class="mission-top">
+              <div class="mission-planet">
+                <PixelPlanet
+                  n={i === 0 ? 20 : 16}
+                  scale={6}
+                  colors={p.planet.colors as [string, string, string]}
+                  ring={p.planet.ring}
+                  bands={p.planet.bands}
+                  seed={p.planet.seed}
+                  class="planet-svg"
+                />
+              </div>
+              <div>
+                <p class="kicker">{p.kicker}</p>
+                <h2 style="font-size:0.95rem">{p.title}</h2>
+              </div>
+            </div>
+            <p>{p.summary}</p>
+            {p.impact && <p class="impact">{p.impact}</p>}
+            <ul class="chips" aria-label="Technologies">
+              {p.tech.map((t) => <li class="chip">{t}</li>)}
+            </ul>
+            <div class="mission-links">
+              <a href={p.repo} rel="noopener">SOURCE &gt;</a>
+              {p.demo && <a href={p.demo} rel="noopener">LIVE &gt;</a>}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+</Base>

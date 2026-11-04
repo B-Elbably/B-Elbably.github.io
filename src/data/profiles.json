@@ -1,0 +1,14 @@
+{
+  "name": "Belal Elbably",
+  "handle": "B-Elbably",
+  "email": "",
+  "github": "https://github.com/B-Elbably",
+  "linkedin": "https://linkedin.com/in/elbably",
+  "codeforces": {
+    "main": { "handle": "Belal.echo", "url": "https://codeforces.com/profile/Belal.echo" },
+    "alt": { "handle": "Belal", "url": "https://codeforces.com/profile/Belal" },
+    "maxRating": 1646
+  },
+  "cses": { "handle": "277252", "url": "https://cses.fi/user/277252" },
+  "leetcode": { "handle": "belalelbably700", "url": "https://leetcode.com/u/belalelbably700/" }
+}

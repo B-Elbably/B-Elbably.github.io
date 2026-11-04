@@ -1,0 +1,211 @@
+<canvas id="starfield" aria-hidden="true"></canvas>
+
+<script>
+  // Low-resolution canvas scaled up with pixelated rendering: every star is one chunky pixel.
+  // Three parallax layers, twinkle in 3 steps, dithered nebula, shooting stars, meteor shower.
+  const canvas = document.getElementById('starfield') as HTMLCanvasElement | null;
+  const ctx = canvas?.getContext('2d');
+
+  if (canvas && ctx) {
+    const PX = 3;
+    const COLORS = ['#ffffff', '#ffffff', '#9aa6e0', '#3df2e0', '#ffd23f', '#ff4fa3'];
+    const LAYER_SPEED = [1.2, 3, 6.5];
+    const LAYER_MOUSE = [1.5, 4, 9];
+    const LAYER_SCROLL = [0.015, 0.04, 0.09];
+    const ALPHA = [0.35, 0.7, 1];
+    const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+    type Star = { x: number; y: number; layer: number; size: number; phase: number; rate: number; color: string };
+    type Shooter = { x: number; y: number; vx: number; vy: number; life: number; delay: number };
+
+    let W = 0;
+    let H = 0;
+    let stars: Star[] = [];
+    let nebula: HTMLCanvasElement | null = null;
+    let shooters: Shooter[] = [];
+    let nextShooter = 3;
+    let scrollY = window.scrollY;
+    const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+    let raf = 0;
+    let last = 0;
+    let clock = 0;
+
+    const motionOn = () => document.documentElement.dataset.motion !== 'off';
+
+    function buildNebula() {
+      const off = document.createElement('canvas');
+      off.width = W;
+      off.height = H;
+      const octx = off.getContext('2d')!;
+      const img = octx.createImageData(W, H);
+      const blobs = [
+        { x: 0.18, y: 0.28, r: 0.34, rgb: [74, 40, 160], k: 1 },
+        { x: 0.82, y: 0.72, r: 0.4, rgb: [3, 168, 158], k: 0.8 },
+        { x: 0.62, y: 0.12, r: 0.22, rgb: [255, 79, 163], k: 0.55 },
+      ];
+      for (let y = 0; y < H; y++) {
+        for (let x = 0; x < W; x++) {
+          let v = 0;
+          let rr = 0;
+          let gg = 0;
+          let bb = 0;
+          for (const b of blobs) {
+            const dx = (x / W - b.x) * (W / H);
+            const dy = y / H - b.y;
+            const f = Math.exp(-(dx * dx + dy * dy) / (b.r * b.r)) * b.k;
+            v += f;
+            rr += b.rgb[0] * f;
+            gg += b.rgb[1] * f;
+            bb += b.rgb[2] * f;
+          }
+          if (v <= 0.01) continue;
+          const t = (BAYER[(y % 4) * 4 + (x % 4)] / 16 - 0.5) * 0.3;
+          const lv = v + t;
+          const i = (y * W + x) * 4;
+          const a = lv > 0.62 ? 0.34 : lv > 0.3 ? 0.18 : 0;
+          if (a === 0) continue;
+          img.data[i] = rr / v;
+          img.data[i + 1] = gg / v;
+          img.data[i + 2] = bb / v;
+          img.data[i + 3] = a * 255;
+        }
+      }
+      octx.putImageData(img, 0, 0);
+      nebula = off;
+    }
+
+    function buildStars() {
+      const count = Math.min(320, Math.floor((W * H) / 420));
+      stars = Array.from({ length: count }, (_, i) => {
+        const layer = i % 3;
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          layer,
+          size: layer === 2 ? 2 : 1,
+          phase: Math.random() * Math.PI * 2,
+          rate: 0.6 + Math.random() * 1.6,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        };
+      });
+    }
+
+    function spawnShooter(delay = 0) {
+      shooters.push({
+        x: Math.random() * W * 0.8,
+        y: Math.random() * H * 0.35,
+        vx: 70 + Math.random() * 30,
+        vy: 35 + Math.random() * 20,
+        life: 0,
+        delay,
+      });
+    }
+
+    function draw() {
+      ctx!.clearRect(0, 0, W, H);
+      if (nebula) ctx!.drawImage(nebula, 0, 0);
+
+      for (const s of stars) {
+        const ox = mouse.x * LAYER_MOUSE[s.layer];
+        const oy = mouse.y * LAYER_MOUSE[s.layer] - (scrollY / PX) * LAYER_SCROLL[s.layer];
+        let x = (s.x - clock * LAYER_SPEED[s.layer] + ox) % W;
+        let y = (s.y + oy) % H;
+        if (x < 0) x += W;
+        if (y < 0) y += H;
+        const level = Math.floor((Math.sin(clock * s.rate + s.phase) + 1) * 1.49);
+        ctx!.globalAlpha = ALPHA[Math.max(0, Math.min(2, level))];
+        ctx!.fillStyle = s.color;
+        const px = Math.floor(x);
+        const py = Math.floor(y);
+        ctx!.fillRect(px, py, s.size, s.size);
+        if (s.size === 2 && level === 2) {
+          // little plus-shaped sparkle on the brightest, nearest stars
+          ctx!.fillRect(px - 1, py, 1, 2);
+          ctx!.fillRect(px + 2, py, 1, 2);
+          ctx!.fillRect(px, py - 1, 2, 1);
+          ctx!.fillRect(px, py + 2, 2, 1);
+        }
+      }
+
+      for (const m of shooters) {
+        if (m.delay > 0) continue;
+        for (let i = 0; i < 10; i++) {
+          ctx!.globalAlpha = Math.max(0, 1 - i / 10);
+          ctx!.fillStyle = i < 2 ? '#ffffff' : '#9aa6e0';
+          ctx!.fillRect(Math.floor(m.x - (m.vx / 60) * i * 1.2), Math.floor(m.y - (m.vy / 60) * i * 1.2), 1, 1);
+        }
+      }
+      ctx!.globalAlpha = 1;
+    }
+
+    function frame(t: number) {
+      raf = requestAnimationFrame(frame);
+      if (t - last < 33) return; // ~30 fps keeps the pixel feel and saves battery
+      const dt = Math.min((t - last) / 1000, 0.1);
+      last = t;
+      clock += dt;
+      mouse.x += (mouse.tx - mouse.x) * 0.06;
+      mouse.y += (mouse.ty - mouse.y) * 0.06;
+
+      nextShooter -= dt;
+      if (nextShooter <= 0) {
+        spawnShooter();
+        nextShooter = 6 + Math.random() * 7;
+      }
+      for (const m of shooters) {
+        if (m.delay > 0) {
+          m.delay -= dt;
+          continue;
+        }
+        m.x += m.vx * dt;
+        m.y += m.vy * dt;
+        m.life += dt;
+      }
+      shooters = shooters.filter((m) => m.life < 1.6 && m.x < W + 20 && m.y < H + 20);
+      draw();
+    }
+
+    function start() {
+      cancelAnimationFrame(raf);
+      if (motionOn() && !document.hidden) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      } else {
+        draw();
+      }
+    }
+
+    function resize() {
+      W = Math.ceil(window.innerWidth / PX);
+      H = Math.ceil(window.innerHeight / PX);
+      canvas!.width = W;
+      canvas!.height = H;
+      buildNebula();
+      buildStars();
+      draw();
+    }
+
+    window.addEventListener('resize', resize);
+    window.addEventListener('scroll', () => (scrollY = window.scrollY), { passive: true });
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        mouse.tx = e.clientX / window.innerWidth - 0.5;
+        mouse.ty = e.clientY / window.innerHeight - 0.5;
+      },
+      { passive: true },
+    );
+    window.addEventListener('motionchange', start);
+    document.addEventListener('visibilitychange', start);
+    window.addEventListener('meteors', () => {
+      for (let i = 0; i < 14; i++) spawnShooter(i * 0.18);
+      if (!motionOn()) {
+        // With motion off, nothing animates, so the shower is skipped.
+        shooters = [];
+      }
+    });
+
+    resize();
+    start();
+  }
+</script>

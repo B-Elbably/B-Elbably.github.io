@@ -1,0 +1,53 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelSprite from '../components/PixelSprite.astro';
+import { astronaut } from '../lib/sprites.js';
+import community from '../data/community.json';
+---
+
+<Base
+  title="Crew"
+  description="Leadership and mentoring by Belal Elbably: president of ACPC Damietta University, DSA curriculum for 500+ students, IEEE Damietta CP committee."
+>
+  <section class="section wrap">
+    <div class="hero-grid" style="align-items:start">
+      <div>
+        <div class="section-head">
+          <p class="eyebrow">&gt; THE CREW</p>
+          <h1>Community and mentoring</h1>
+          <p>
+            I believe in scaling impact through shared knowledge. My roles go beyond management into designing
+            entire learning systems.
+          </p>
+        </div>
+        <ol class="quest-log">
+          {
+            community.map((c) => (
+              <li class="quest">
+                <h2 style="font-size:0.8rem">{c.role}</h2>
+                <p class="org">{c.org}</p>
+                <p>{c.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <div aria-hidden="true" style="display:grid;place-items:center">
+        <div class="astro-float" style="position:relative;left:auto;bottom:auto;width:min(60%,240px)">
+          <PixelSprite rows={astronaut} scale={8} class="astro-svg" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="join-h">
+    <div class="panel cta">
+      <h2 id="join-h">Want to join the crew?</h2>
+      <p class="muted">Students at Damietta University can reach the community through the ACPC website.</p>
+      <div class="btn-row">
+        <a class="btn" href="https://github.com/B-Elbably/ACPC-Damietta-website" rel="noopener">ACPC website repo</a>
+        <a class="btn btn-ghost" href="/contact">Contact</a>
+      </div>
+    </div>
+  </section>
+</Base>

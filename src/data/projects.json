@@ -1,0 +1,38 @@
+[
+  {
+    "id": "acpc-du-echo",
+    "title": "ACPC-DU Echo",
+    "kicker": "Flagship mission",
+    "tags": ["backend"],
+    "summary": "A real-time ranking backend and community archival system.",
+    "impact": "WebSocket-driven architecture for live data synchronization, with MongoDB aggregation pipelines tuned for low latency under high concurrency.",
+    "tech": ["Node.js", "Express", "MongoDB", "Socket.IO"],
+    "repo": "https://github.com/B-Elbably/CF-Echo",
+    "demo": "",
+    "planet": { "colors": ["#3df2e0", "#03a89e", "#07555a"], "ring": false, "seed": 7, "bands": true }
+  },
+  {
+    "id": "railway-to-acpc",
+    "title": "Railway to ACPC",
+    "kicker": "Algorithms",
+    "tags": ["algorithms"],
+    "summary": "An 8-month algorithmic roadmap and implementation library for national-level preparation.",
+    "impact": "50+ optimized C++ templates for advanced data structures, used as a standard training resource for university teams.",
+    "tech": ["C++", "Competitive programming", "Algorithmic optimization"],
+    "repo": "https://github.com/B-Elbably/Railway-to-ACPC",
+    "demo": "",
+    "planet": { "colors": ["#ffd23f", "#ff8a3d", "#8a3d1f"], "ring": true, "seed": 3, "bands": false }
+  },
+  {
+    "id": "acpc-damietta-website",
+    "title": "ACPC Damietta Website",
+    "kicker": "Community",
+    "tags": ["web"],
+    "summary": "The website of the ACPC Damietta University community.",
+    "impact": "",
+    "tech": ["EJS", "JavaScript"],
+    "repo": "https://github.com/B-Elbably/ACPC-Damietta-website",
+    "demo": "",
+    "planet": { "colors": ["#ff9ad0", "#ff4fa3", "#7a1f57"], "ring": false, "seed": 11, "bands": false }
+  }
+]

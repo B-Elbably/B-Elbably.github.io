@@ -1,0 +1,29 @@
+---
+import profiles from '../data/profiles.json';
+import PixelSprite from './PixelSprite.astro';
+import { ufo } from '../lib/sprites.js';
+const built = new Date().toISOString().slice(0, 10);
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-ufo" aria-hidden="true">
+      <PixelSprite rows={ufo} scale={4} />
+    </div>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="footer-row">
+      <p class="footer-copy">
+        &copy; 2026 {profiles.name}. Built with Astro, hosted on GitHub Pages.
+      </p>
+      <ul class="footer-links">
+        <li><a href={profiles.github} rel="me noopener">GitHub</a></li>
+        <li><a href={profiles.linkedin} rel="me noopener">LinkedIn</a></li>
+        <li><a href={profiles.codeforces.main.url} rel="me noopener">Codeforces</a></li>
+      </ul>
+    </div>
+    <p class="footer-hint">
+      <span class="sr-only">Easter egg: </span>Try the Konami code for a meteor shower.{' '}
+      <span class="muted-dim">Last built {built}.</span>
+    </p>
+  </div>
+</footer>

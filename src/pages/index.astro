@@ -1,0 +1,177 @@
+---
+import Base from '../layouts/Base.astro';
+import HeroArt from '../components/HeroArt.astro';
+import PixelPlanet from '../components/PixelPlanet.astro';
+import stats from '../data/stats.json';
+import projects from '../data/projects.json';
+import community from '../data/community.json';
+import profiles from '../data/profiles.json';
+
+const desc =
+  'Belal Elbably: backend engineer, Codeforces Expert and president of ACPC Damietta. Real-time systems, algorithms and community building.';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Belal Elbably',
+  url: 'https://bably.me',
+  jobTitle: 'Software Engineer',
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Damietta University' },
+  address: { '@type': 'PostalAddress', addressLocality: 'Damietta', addressCountry: 'EG' },
+  sameAs: [profiles.github, profiles.linkedin, profiles.codeforces.main.url, profiles.leetcode.url],
+};
+
+const taglines = [
+  'Converting complex logic into high-performance systems.',
+  '3,000+ problems solved. Codeforces Expert.',
+  'Real-time backends with Node, Socket.IO and MongoDB.',
+  'President of ACPC Damietta University.',
+];
+
+const [flagship, ...others] = projects;
+const stackGroups = [
+  { name: 'Languages', items: ['C++', 'JavaScript', 'TypeScript', 'Python', 'SQL'] },
+  { name: 'Backend', items: ['Node.js', 'Express', 'Socket.IO', 'REST APIs', 'JWT', 'Cron jobs'] },
+  { name: 'Databases', items: ['PostgreSQL', 'MongoDB', 'MySQL', 'Neo4j', 'Redis', 'SQL Server'] },
+  { name: 'Environment', items: ['Git', 'Docker', 'Linux', 'Vercel', 'Railway', 'Jest'] },
+];
+---
+
+<Base title="Belal Elbably" description={desc} jsonLd={jsonLd}>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">&gt; PLAYER ONE ONLINE</p>
+        <h1>Hi, I'm <span class="accent">Belal Elbably</span></h1>
+        <p class="term typing" data-typing data-lines={JSON.stringify(taglines)}>
+          <span class="typed">{taglines[0]}</span><span class="caret" aria-hidden="true"></span>
+        </p>
+        <p class="lead">
+          Backend engineer who reads code through an algorithmic lens. Computer Science at Damietta University,
+          class of 2027, based in Damietta, Egypt.
+        </p>
+        <div class="btn-row">
+          <a class="btn" href="/projects">View missions</a>
+          <a class="btn btn-alt" href="/contact">Open comms</a>
+        </div>
+      </div>
+      <HeroArt />
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="stats-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; PLAYER STATS</p>
+      <h2 id="stats-h">Scoreboard</h2>
+    </div>
+    <div class="stat-grid">
+      {
+        stats.map((s) => (
+          <div class="panel stat">
+            <span class="stat-label">{s.label}</span>
+            <span
+              class="stat-value"
+              data-count={s.value}
+              data-prefix={s.prefix ?? ''}
+              data-suffix={s.suffix ?? ''}
+            >
+              {`${s.prefix ?? ''}${s.value.toLocaleString('en-US')}${s.suffix ?? ''}`}
+            </span>
+            <span class="stat-note">{s.note}</span>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="missions-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; FEATURED MISSIONS</p>
+      <h2 id="missions-h">Systems I have built</h2>
+    </div>
+    <div class="mission-grid">
+      {
+        [flagship, ...others].map((p, i) => (
+          <article class:list={['panel', 'panel-hover', 'mission', { wide: i === 0 }]}>
+            <div class="mission-top">
+              <div class="mission-planet">
+                <PixelPlanet
+                  n={i === 0 ? 20 : 16}
+                  scale={6}
+                  colors={p.planet.colors as [string, string, string]}
+                  ring={p.planet.ring}
+                  bands={p.planet.bands}
+                  seed={p.planet.seed}
+                  class="planet-svg"
+                />
+              </div>
+              <div>
+                <p class="kicker">{p.kicker}</p>
+                <h3>{p.title}</h3>
+              </div>
+            </div>
+            <p>{p.summary}</p>
+            {p.impact && <p class="impact">{p.impact}</p>}
+            <ul class="chips" aria-label="Technologies">
+              {p.tech.map((t) => <li class="chip">{t}</li>)}
+            </ul>
+            <div class="mission-links">
+              <a href={p.repo} rel="noopener">SOURCE &gt;</a>
+              {p.demo && <a href={p.demo} rel="noopener">LIVE &gt;</a>}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+    <div class="btn-row"><a class="btn btn-ghost" href="/projects">All missions</a></div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="stack-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; INVENTORY</p>
+      <h2 id="stack-h">Tech stack</h2>
+    </div>
+    <div class="skill-grid">
+      {
+        stackGroups.map((g) => (
+          <div class="panel">
+            <h3>{g.name}</h3>
+            <ul class="chips">
+              {g.items.map((i) => <li class="chip">{i}</li>)}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="crew-h">
+    <div class="section-head">
+      <p class="eyebrow">&gt; QUEST LOG</p>
+      <h2 id="crew-h">Leadership</h2>
+    </div>
+    <ol class="quest-log">
+      {
+        community.map((c) => (
+          <li class="quest">
+            <h3>{c.role}</h3>
+            <p class="org">{c.org}</p>
+            <p>{c.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <div class="btn-row"><a class="btn btn-ghost" href="/community">Meet the crew</a></div>
+  </section>
+
+  <section class="section wrap reveal" aria-labelledby="cta-h">
+    <div class="panel cta">
+      <h2 id="cta-h">Ready for the next mission?</h2>
+      <p class="muted">Internships, collaboration, mentoring and contests are all welcome.</p>
+      <div class="btn-row">
+        <a class="btn" href="/contact">Contact</a>
+        <a class="btn btn-ghost" href={profiles.github} rel="me noopener">GitHub</a>
+      </div>
+    </div>
+  </section>
+</Base>

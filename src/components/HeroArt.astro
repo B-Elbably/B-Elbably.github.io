@@ -1,0 +1,44 @@
+---
+import PixelPlanet from './PixelPlanet.astro';
+import PixelSprite from './PixelSprite.astro';
+import { astronaut, rocket, flameA, flameB } from '../lib/sprites.js';
+---
+
+<div class="hero-art" aria-hidden="true">
+  <div class="art-glow"></div>
+
+  <div class="planet-main">
+    <PixelPlanet n={36} scale={10} colors={['#8f7bff', '#5a3fd1', '#2d1f7a']} ring seed={5} class="planet-svg" />
+  </div>
+
+  <div class="orbit orbit-a">
+    <div class="moon moon-a">
+      <PixelPlanet n={10} scale={6} colors={['#3df2e0', '#03a89e', '#07555a']} seed={2} class="planet-svg" />
+    </div>
+  </div>
+  <div class="orbit orbit-b">
+    <div class="moon moon-b">
+      <PixelPlanet n={8} scale={6} colors={['#ffd23f', '#ff8a3d', '#8a3d1f']} seed={9} class="planet-svg" />
+    </div>
+  </div>
+
+  <div class="astro-float">
+    <PixelSprite rows={astronaut} scale={7} class="astro-svg" />
+  </div>
+
+  <span class="spark s1"></span>
+  <span class="spark s2"></span>
+  <span class="spark s3"></span>
+  <span class="spark s4"></span>
+  <span class="spark s5"></span>
+</div>
+
+<div class="rocket-lane" aria-hidden="true">
+  <div class="rocket">
+    <PixelSprite rows={rocket} scale={5} class="rocket-svg" />
+    <div class="flame">
+      <PixelSprite rows={flameA} scale={5} class="flame-a" />
+      <PixelSprite rows={flameB} scale={5} class="flame-b" />
+    </div>
+  </div>
+</div>
